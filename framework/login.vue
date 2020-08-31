@@ -58,7 +58,7 @@
                             username: tempUserName,
                             password: tempPassWord
                         };
-                        window.SysApp.getRoutesByDynamics(self).then(function() {
+                        window.SysApp.getRoutesByDynamics(self.$router).then(function() {
                             self.$store.commit("userInfoChange/setIsUserLogin", true);
                         });
                         //                      this.$store.dispatch("userInfo/login", params).then(res => {

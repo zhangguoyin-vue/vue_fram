@@ -59,6 +59,11 @@
                     });
                 };
                 self.$store.commit("systemChange/setLanguage_Change", config.language);
+                if(config.isNewAuthentication == false) {
+                    window.SysApp.getRoutesByDynamics(self.$router).then(function() {
+                        self.$store.commit("userInfoChange/setIsUserLogin", true);
+                    });
+                }
             }
         });
     });

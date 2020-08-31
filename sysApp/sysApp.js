@@ -268,8 +268,8 @@ define(
                 }
             },
 
-            getRoutesByDynamics: function(context) {
-                return routerLoad.getRoutesByDynamics(context);
+            getRoutesByDynamics: function(router) {
+                return routerLoad.getRoutesByDynamics(router);
             },
 
             //根据产品ID获取对应的菜单文件

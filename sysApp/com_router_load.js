@@ -1,7 +1,7 @@
 define(["configs"], function(config) {
     'use strict';
     return {
-        getRoutesByDynamics: function(context) {
+        getRoutesByDynamics: function(router) {
             var _self = this;
             return new Promise(function(resolve, reject) {
                 var tempUenuList = [];
@@ -12,7 +12,7 @@ define(["configs"], function(config) {
                     _self.getHomeMenuOrRouterList(config.systemMenus, tempUenuList, tempRouterRoot.children, tempRouterNameList);
                 }
                 config.showMenus = tempUenuList;
-                context.$router.addRoutes(tempRouterRoot.children);
+                router.addRoutes(tempRouterRoot.children);
                 resolve(true);
             });
 

@@ -26,12 +26,23 @@ require([
         //mode: "history",
         routes: []
     });
+    window.store = store;
+    window.router = router;
     const originalReplace = VueRouter.prototype.replace;
     VueRouter.prototype.replace = function replace(location) {
         return originalReplace.call(this, location).catch(err => err);
     };
     //路由守护，确保有效路由可以执行
     router.beforeEach((to, from, next) => {
+        if(to.path && (to.path == "/" || to.path == "/Login")) {
+            next();
+        } else if(!to.name || (to.name && to.name.length <= 0)) {
+            window.SysApp.getRoutesByDynamics(window.router).then(function() {
+                window.store.commit("userInfoChange/setIsUserLogin", true);
+                next(to.path);
+            });
+            return;
+        }
         next();
     });
 
