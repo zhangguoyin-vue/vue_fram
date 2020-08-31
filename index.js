@@ -23,6 +23,7 @@ require([
     });
     Vue.component('frame-layout', frameLayout);
     var router = new VueRouter({
+        //mode: "history",
         routes: []
     });
     const originalReplace = VueRouter.prototype.replace;

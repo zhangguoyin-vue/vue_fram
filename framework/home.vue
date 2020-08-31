@@ -26,6 +26,11 @@
                     navMenus: config.showMenus
                 };
             },
+            watch: {
+                "$store.state.systemChange.Language_Change": function(type) {
+                    var j = 0;
+                },
+            },
 
             mounted: function() {
 

@@ -138,6 +138,7 @@ define(["vju", "json!./zhangTesti18nDic.json"], function (Vue, i18nDic) {
       changeType(type) {
         localStorage.setItem("locale", type);
         this.$i18n.locale = type;
+        this.$store.commit("systemChange/setLanguage_Change", type);
       },
       btnDataChange: function (event) {
         this.msg = "系统测试，问题解决了！";

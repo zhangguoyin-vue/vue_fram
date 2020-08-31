@@ -9,8 +9,9 @@
     define([
         "vju",
         "vue!./home.vue",
+        "configs",
         window.configs.logUrlVue
-    ], function(Vue, home, login) {
+    ], function(Vue, home, config, login) {
         return Vue.component("frame-layout", {
             template: template,
             data: function() {
@@ -57,6 +58,7 @@
                         height: tempHeight,
                     });
                 };
+                self.$store.commit("systemChange/setLanguage_Change", config.language);
             }
         });
     });

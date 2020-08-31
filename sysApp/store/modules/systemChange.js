@@ -7,6 +7,7 @@ define(function () {
             Page_Size_Change: { width: 0, height: 0 },
             Style_Change: "",
             isMenuOpen: false,
+            Language_Change: "zh",
         },
         getters: {
             getIsMenuOpen: state => {
@@ -22,6 +23,9 @@ define(function () {
             },
             setIsMenuOpen(state, ve) {
                 state.isMenuOpen = ve
+            },
+            setLanguage_Change(state, ve) {
+                state.Language_Change = ve
             }
         },
     }
