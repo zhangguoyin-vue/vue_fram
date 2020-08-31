@@ -1,7 +1,7 @@
 define(
     [],
 
-    function () {
+    function() {
 
         "use strict";
 
@@ -14,7 +14,8 @@ define(
             "isActive": true,
             "imgSrc": "imgs/first.png",
             "imgClickSrc": "imgs/first_click.png",
-            "visible": true
+            "visible": true,
+            "childViews": []
         }, {
             "zhName": "张国印测试2",
             'enName': "zhangTestChild",

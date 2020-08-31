@@ -88,11 +88,13 @@ define(["configs"], function(config) {
         getHomeMenuModel: function(tempId, item) {
             var tempMenuItem = {
                 id: tempId,
-                menuName: item.zhName,
+                menuNameZh: item.zhName,
+                menuNameEn: item.enName,
                 value: "/" + item.templateName,
                 templateName: item.templateName,
                 url: item.url,
                 visible: item.visible,
+                isActive: item.isActive,
                 imgSrc: item.imgSrc,
                 imgClickSrc: item.imgClickSrc,
                 operationId: item.operationId,

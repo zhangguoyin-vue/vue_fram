@@ -3,7 +3,7 @@
         <div class="tabs">
             <div v-for="(navMenu) in navMenus">
                 <router-link tag="li" active-class="is-active" :to="navMenu.value">
-                    <a>{{navMenu.menuName}}</a>
+                    <a>{{navMenu.menuNameZh}}</a>
                 </router-link>
             </div>
         </div>
