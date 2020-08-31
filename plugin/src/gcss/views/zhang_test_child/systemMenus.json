@@ -1,0 +1,22 @@
+[
+    {
+        "name": "HelloWorld",
+        "templateName": "HelloWorld",
+        "url": "./src/HelloWorld.vue",
+        "singleton": true,
+        "isActive": true,
+        "visible": true,
+        "imgSrc": "img/first.png",
+        "imgClickSrc": "img/first_click.png"
+    },
+    {
+        "name": "ZhangTest1",
+        "templateName": "ZhangTest1",
+        "url": "./src/ZhangTest1.vue",
+        "singleton": true,
+        "isActive": true,
+        "visible": true,
+        "imgSrc": "img/first.png",
+        "imgClickSrc": "img/first_click.png"
+    }
+]
