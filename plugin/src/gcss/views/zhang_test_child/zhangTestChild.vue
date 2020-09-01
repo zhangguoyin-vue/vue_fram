@@ -12,7 +12,7 @@
 define([
   "vju",
   "./commHelp",
-  "json!plugin/src/gcss/config/zhang_test_child_config/systemMenus.json",
+  "json!plugin/src/gcss/configs/zhang_test_child_config/systemMenus.json",
   "vue!plugin/component/comp_echart/comp_echart_pie.vue",
 ], function (Vue, commHelp, sysConfig) {
   return Vue.component("zhang-test-child", {
@@ -88,9 +88,3 @@ define([
   });
 });
 </script>
-
-<style scoped>
-.zhang-test-child-body {
-  background: red;
-}
-</style>

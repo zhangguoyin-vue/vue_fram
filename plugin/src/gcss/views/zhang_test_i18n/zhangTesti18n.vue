@@ -47,7 +47,7 @@
 </template>
 
 <script>
-define(["vju", "json!json!plugin/src/gcss/config/zhang_test_i18n_config/zhangTesti18nDic.json"], function (Vue, i18nDic) {
+define(["vju", "json!plugin/src/gcss/configs/zhang_test_i18n_config/zhangTesti18nDic.json"], function (Vue, i18nDic) {
   return Vue.component("zhang-test-i18n", {
     template: template,
     i18n: {
