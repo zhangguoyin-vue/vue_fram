@@ -3,8 +3,9 @@
     "grunt": "^1.2.1"
   },
   "devDependencies": {
-    "babel-preset-es2015": "^6.24.1",
     "babel-core": "^6.26.3",
+    "babel-preset-es2015": "^6.24.1",
+    "grunt": "^1.3.0",
     "grunt-babel": "^7.0.0",
     "grunt-contrib-clean": "^2.0.0",
     "grunt-contrib-concat": "^1.0.1",
@@ -13,5 +14,25 @@
     "grunt-contrib-htmlmin": "^3.1.0",
     "grunt-contrib-uglify": "^5.0.0",
     "grunt-vue-split-file": "^0.2.2"
-  }
+  },
+  "name": "vue_fram",
+  "version": "1.0.0",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zhangguoyin-vue/vue_fram.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/zhangguoyin-vue/vue_fram/issues"
+  },
+  "homepage": "https://github.com/zhangguoyin-vue/vue_fram#readme",
+  "description": ""
 }
