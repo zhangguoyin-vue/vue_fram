@@ -12,7 +12,7 @@
 define([
   "vju",
   "./commHelp",
-  "json!./systemMenus.json",
+  "json!plugin/src/gcss/config/zhang_test_child_config/systemMenus.json",
   "vue!plugin/component/comp_echart/comp_echart_pie.vue",
 ], function (Vue, commHelp, sysConfig) {
   return Vue.component("zhang-test-child", {
