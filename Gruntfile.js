@@ -26,7 +26,7 @@ module.exports = function (grunt) {
             grunt.config.data.clean.clena_last = getDeleteFlieByJson();
             grunt.config.data.concat.basic_and_extras.files = getJsJsonListToObject();
 
-            grunt.task.run(['babel:babelDist', "cssmin:yasuoDist", "htmlmin:yasuoDist", "uglify:bulidDist", "concat", 'clean:clena_last', "babel:babelSrc", "cssmin:yasuoSrc", "htmlmin:yasuoSrc", "uglify:bulidSrc", "copy"])
+            grunt.task.run(['babel:babelDist', "cssmin:yasuoDist", "htmlmin:yasuoDist", "uglify:bulidDist", "concat", 'clean:clena_last', "babel:babelSrc", "cssmin:yasuoSrc", "htmlmin:yasuoSrc", "uglify:bulidSrc", "copy", "clean:clean_grunt"])
 
             done(true)   //给回调函数传入false实参
         } else {
@@ -68,7 +68,7 @@ module.exports = function (grunt) {
         clean: {
             src: ["dist"],
             clena_last: cleanFileList,
-            clean_grunt: ["node_modules"]
+            clean_grunt: ["dist/node_modules"]
         },
         //拆分VUE文件为 HTML JS CSS
         vue_split_file: {
@@ -289,9 +289,9 @@ module.exports = function (grunt) {
                 files: [
                     { expand: true, src: ['imgs/**'], dest: 'dist/' },
                     { expand: true, src: ['lib/**'], dest: 'dist/' },
-                    { expand: true, src: ["plugin/src/" + product + "configs/**"], dest: "dist/plugin/src/" + product + "configs" },
-                    { expand: true, src: ["plugin/src/" + product + "files/**"], dest: "dist/plugin/src/" + product + "files" },
-                    { expand: true, src: ["plugin/src/" + product + "imgs/**"], dest: "dist/plugin/src/" + product + "imgs" },
+                    { expand: true, src: ["plugin/src/" + product + "/configs/**"], dest: "dist/" },
+                    { expand: true, src: ["plugin/src/" + product + "/files/**"], dest: "dist/" },
+                    { expand: true, src: ["plugin/src/" + product + "/imgs/**"], dest: "dist/" },
                 ],
             },
         },
@@ -317,5 +317,5 @@ module.exports = function (grunt) {
     //grunt.registerTask('default', ['clean:src', "vue_split_file", 'asyncTask'])
     grunt.registerTask('release', ['clean:src', "vue_split_file", 'asyncTask'])
 
-    //grunt.registerTask('release', ['clean:src', "uglify:bulidSrc"]);
+    //grunt.registerTask('release', ['copy']);
 };
