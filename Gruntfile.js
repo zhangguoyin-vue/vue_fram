@@ -6,12 +6,44 @@ module.exports = function (grunt) {
         grunt.log.writeln('    parameter of current product can\'t be null!');
         grunt.log.writeln('正确示例：');
         grunt.log.writeln('    grunt release --product=bhz');
+        grunt.log.writeln('    grunt frame --product=frame');
+
         return;
     } else {
         grunt.log.writeln('parameter of current product is ' + product + '.');
     }
-    let cleanFileList = [];
-    let concatFileList = {};
+
+    function execGruntTaskFrame(done, jsonPath) {
+        var isFeleCheck = getIsFileExists(jsonPath);
+        if (isFeleCheck) {
+            grunt.config.data.clean.clena_last = getDeleteFlieByJson(jsonPath);
+            grunt.config.data.concat.basic_and_extras.files = getJsJsonListToObject(jsonPath);
+
+            grunt.task.run(['babel:babelFrame', "cssmin:cssminFrame", "htmlmin:htmlminFrame", "uglify:uglifyFrame", "concat", 'clean:clena_last', "copy:copyFrame", "clean:clean_grunt"]);
+
+            done(true)   //给回调函数传入false实参
+        } else {
+            setTimeout(() => {
+                execGruntTaskFrame(done, jsonPath);
+            }, 1000)
+        }
+    };
+
+    function asyncTaskSrc(done, jsonPath) {
+        var isFeleCheck = getIsFileExists(jsonPath);
+        if (isFeleCheck) {
+            grunt.config.data.clean.clena_last = getDeleteFlieByJson(jsonPath);
+            grunt.config.data.concat.basic_and_extras.files = getJsJsonListToObject(jsonPath);
+
+            grunt.task.run(['babel:babelSrc', "cssmin:cssminSrc", "htmlmin:htmlminSrc", "uglify:uglifySrc", "concat", 'clean:clena_last', "copy:copySrc", "clean:clean_grunt"])
+
+            done(true)   //给回调函数传入false实参
+        } else {
+            setTimeout(() => {
+                asyncTaskSrc(done, jsonPath);
+            }, 1000)
+        }
+    }
 
     function getIsFileExists(filepath) {
         if (!grunt.file.exists(filepath)) {
@@ -19,25 +51,21 @@ module.exports = function (grunt) {
         } else {
             return true;
         }
-    }
-    function execGruntTask(done) {
-        var isFeleCheck = getIsFileExists(splitLogPath);
-        if (isFeleCheck) {
-            grunt.config.data.clean.clena_last = getDeleteFlieByJson();
-            grunt.config.data.concat.basic_and_extras.files = getJsJsonListToObject();
+    };
 
-            grunt.task.run(['babel:babelDist', "cssmin:yasuoDist", "htmlmin:yasuoDist", "uglify:bulidDist", "concat", 'clean:clena_last', "babel:babelSrc", "cssmin:yasuoSrc", "htmlmin:yasuoSrc", "uglify:bulidSrc", "copy", "clean:clean_grunt"])
+    function getDeleteFlieByJson(filepath) {
+        var jsJsonFlieList = grunt.file.readJSON(filepath);
+        var tempObjects = [filepath];
+        jsJsonFlieList.forEach(function (itemJson) {
+            itemJson.fileNameList.forEach(function (itemFile) {
+                tempObjects.push(itemFile);
+            });
+        });
+        return tempObjects;
+    };
 
-            done(true)   //给回调函数传入false实参
-        } else {
-            setTimeout(() => {
-                execGruntTask();
-            }, 1000)
-        }
-    }
-
-    function getJsJsonListToObject() {
-        var jsJsonFlieList = grunt.file.readJSON(splitLogPath);
+    function getJsJsonListToObject(filepath) {
+        var jsJsonFlieList = grunt.file.readJSON(filepath);
         var tempObject = {};
         jsJsonFlieList.forEach(function (itemJson) {
             let destFileName = itemJson.jsFlieName;
@@ -50,32 +78,22 @@ module.exports = function (grunt) {
         return tempObject;
     };
 
-    function getDeleteFlieByJson() {
-        var jsJsonFlieList = grunt.file.readJSON(splitLogPath);
-        var tempObjects = [splitLogPath];
-        jsJsonFlieList.forEach(function (itemJson) {
-            itemJson.fileNameList.forEach(function (itemFile) {
-                tempObjects.push(itemFile);
-            });
-        });
-        return tempObjects;
-    };
-
 
     // Project configuration.
     grunt.initConfig({
         //删除目录
         clean: {
-            src: ["dist"],
-            clena_last: cleanFileList,
+            dist: ["dist"],
+            src: ["dist/plugin/src/" + product],
+            clena_last: [],
             clean_grunt: ["dist/node_modules"]
         },
         //拆分VUE文件为 HTML JS CSS
         vue_split_file: {
             options: {
-                excepts: ["App.vue"]
+                excepts: []
             },
-            yasuo: {
+            vueSplitFrame: {
                 files: [
                     {
                         expand: true,//表示使用相对路径
@@ -87,12 +105,16 @@ module.exports = function (grunt) {
                         cwd: "plugin/component",//相对路径的根目录
                         src: "**/*.vue",//相对路径下需要压缩的文件，*表示所有该后缀类型的文件，写具体的就是某个具体的文件将会被压缩
                         dest: "dist/plugin/component"//压缩后的文件需要放置的目录，如果不存在的话，会自动创建
-                    }, {
-                        expand: true,//表示使用相对路径
-                        cwd: "plugin/src/" + product,//相对路径的根目录
-                        src: "**/*.vue",//相对路径下需要压缩的文件，*表示所有该后缀类型的文件，写具体的就是某个具体的文件将会被压缩
-                        dest: "dist/plugin/src/" + product //压缩后的文件需要放置的目录，如果不存在的话，会自动创建
                     }
+                ]
+            },
+            vueSplitSrc: {
+                files: [{
+                    expand: true,//表示使用相对路径
+                    cwd: "plugin/src/" + product,//相对路径的根目录
+                    src: "**/*.vue",//相对路径下需要压缩的文件，*表示所有该后缀类型的文件，写具体的就是某个具体的文件将会被压缩
+                    dest: "dist/plugin/src/" + product //压缩后的文件需要放置的目录，如果不存在的话，会自动创建
+                }
                 ]
             }
         },
@@ -102,113 +124,136 @@ module.exports = function (grunt) {
                 sourceMap: false,
                 presets: ['babel-preset-es2015']
             },
-            babelDist: {
-                files: [
-                    {
-                        expand: true,//表示使用相对路径
-                        cwd: "dist",//相对路径的根目录
-                        src: "**/*.js",//相对路径下需要压缩的文件，*表示所有该后缀类型的文件，写具体的就是某个具体的文件将会被压缩
-                        dest: "dist"//压缩后的文件需要放置的目录，如果不存在的话，会自动创建
-                    }
-                ]
+            babelFrame: {
+                files: [{
+                    expand: true,
+                    cwd: "dist/framework/",
+                    src: "**/*.js",
+                    dest: "dist/framework"
+                }, {
+                    expand: true,
+                    cwd: "dist/plugin/component",
+                    src: "**/*.js",
+                    dest: "dist/plugin/component"
+                }, {
+                    expand: true,
+                    cwd: "common",
+                    src: "**/*.js",
+                    dest: "dist/common"
+                }, {
+                    expand: true,
+                    cwd: "configures",
+                    src: "**/*.js",
+                    dest: "dist/configures"
+                }, {
+                    expand: true,
+                    cwd: "framework",
+                    src: "**/*.js",
+                    dest: "dist/framework"
+                }, {
+                    expand: true,
+                    cwd: "i18n",
+                    src: "**/*.js",
+                    dest: "dist/i18n"
+                }, {
+                    expand: true,
+                    cwd: "sysApp",
+                    src: "**/*.js",
+                    dest: "dist/sysApp"
+                }, {
+                    expand: true,
+                    cwd: "",
+                    src: "index.js",
+                    dest: "dist/"
+                }, {
+                    expand: true,
+                    cwd: "",
+                    src: "main.config.js",
+                    dest: "dist/"
+                }]
             },
             babelSrc: {
-                files: [
-                    {
-                        expand: true,
-                        cwd: "common",
-                        src: "**/*.js",
-                        dest: "dist/common"
-                    }, {
-                        expand: true,
-                        cwd: "configures",
-                        src: "**/*.js",
-                        dest: "dist/configures"
-                    }, {
-                        expand: true,
-                        cwd: "framework",
-                        src: "**/*.js",
-                        dest: "dist/framework"
-                    }, {
-                        expand: true,
-                        cwd: "i18n",
-                        src: "**/*.js",
-                        dest: "dist/i18n"
-                    }, {
-                        expand: true,
-                        cwd: "sysApp",
-                        src: "**/*.js",
-                        dest: "dist/sysApp"
-                    }, {
-                        expand: true,
-                        cwd: "",
-                        src: "index.js",
-                        dest: "dist/"
-                    }, {
-                        expand: true,
-                        cwd: "",
-                        src: "main.config.js",
-                        dest: "dist/"
-                    }, {
-                        expand: true,
-                        cwd: "plugin/src/" + product,
-                        src: "**/*.js",
-                        dest: "dist/plugin/src/" + product
-                    }
+                files: [{
+                    expand: true,
+                    cwd: "dist/plugin/src/" + product,
+                    src: "**/*.js",
+                    dest: "dist/plugin/src/" + product
+                },
+                {
+                    expand: true,
+                    cwd: "plugin/src/" + product,
+                    src: "**/*.js",
+                    dest: "dist/plugin/src/" + product
+                }
                 ]
             }
         },
         //压缩CSS
         cssmin: {
-            yasuoDist: {
-                options: {
-                    mangle: false
-                },
-                expand: true,
-                cwd: 'dist',//压缩那个文件夹里的文件
-                src: '**/*.css',//压缩那个文件
-                dest: 'dist',//放压缩后文件的文件夹
-                ext: '.css'//压缩后文件的的名字
+            options: {
+                mangle: false
             },
-            yasuoSrc: {
+            cssminFrame: {
+                files: [{
+                    expand: true,
+                    cwd: "dist/framework/",
+                    src: '**/*.css',
+                    dest: "dist/framework",
+                    ext: '.css'
+                }, {
+                    expand: true,
+                    cwd: "dist/plugin/component",
+                    src: '**/*.css',
+                    dest: "dist/plugin/component",
+                    ext: '.css'
+                }, {
+                    expand: true,
+                    cwd: "common",
+                    src: "**/*.css",
+                    dest: "dist/common",
+                    ext: '.css'
+                }, {
+                    expand: true,
+                    cwd: "configures",
+                    src: "**/*.css",
+                    dest: "dist/configures",
+                    ext: '.css'
+                }, {
+                    expand: true,
+                    cwd: "framework",
+                    src: "**/*.css",
+                    dest: "dist/framework",
+                    ext: '.css'
+                }, {
+                    expand: true,
+                    cwd: "i18n",
+                    src: "**/*.css",
+                    dest: "dist/i18n",
+                    ext: '.css'
+                }, {
+                    expand: true,
+                    cwd: "sysApp",
+                    src: "**/*.css",
+                    dest: "dist/sysApp",
+                    ext: '.css'
+                }, {
+                    expand: true,
+                    cwd: "themes",
+                    src: "**/*.css",
+                    dest: "dist/themes",
+                    ext: '.css'
+                }]
+            },
+            cssminSrc: {
                 files: [
                     {
                         expand: true,
-                        cwd: "common",
+                        cwd: "dist/plugin/src/" + product,
                         src: "**/*.css",
-                        dest: "dist/common",
+                        dest: "dist/plugin/src/" + product,
                         ext: '.css'
-                    }, {
-                        expand: true,
-                        cwd: "configures",
-                        src: "**/*.css",
-                        dest: "dist/configures",
-                        ext: '.css'
-                    }, {
-                        expand: true,
-                        cwd: "framework",
-                        src: "**/*.css",
-                        dest: "dist/framework",
-                        ext: '.css'
-                    }, {
-                        expand: true,
-                        cwd: "i18n",
-                        src: "**/*.css",
-                        dest: "dist/i18n",
-                        ext: '.css'
-                    }, {
-                        expand: true,
-                        cwd: "sysApp",
-                        src: "**/*.css",
-                        dest: "dist/sysApp",
-                        ext: '.css'
-                    }, {
-                        expand: true,
-                        cwd: "themes",
-                        src: "**/*.css",
-                        dest: "dist/themes",
-                        ext: '.css'
-                    }, {
+                    },
+                    {
                         expand: true,
                         cwd: "plugin/src/" + product,
                         src: "**/*.css",
@@ -216,7 +261,7 @@ module.exports = function (grunt) {
                         ext: '.css'
                     }
                 ]
-            }
+            },
         },
         //压缩HTML
         htmlmin: {
@@ -231,17 +276,67 @@ module.exports = function (grunt) {
                 removeEmptyAttributes: true,//移除空的属性
                 removeOptionalTags: true//移除可选附加标签
             },
-            yasuoDist: {
-                expand: true,
-                cwd: 'dist/',
-                src: ['**/*.html'],
-                dest: 'dist'
+            htmlminFrame: {
+                files: [{
+                    expand: true,
+                    cwd: "dist/framework/",
+                    src: '**/*.html',
+                    dest: "dist/framework",
+                }, {
+                    expand: true,
+                    cwd: "dist/plugin/component",
+                    src: '**/*.html',
+                    dest: "dist/plugin/component",
+                }, {
+                    expand: true,
+                    cwd: "common",
+                    src: "**/*.html",
+                    dest: "dist/common",
+                }, {
+                    expand: true,
+                    cwd: "configures",
+                    src: "**/*.html",
+                    dest: "dist/configures",
+                }, {
+                    expand: true,
+                    cwd: "framework",
+                    src: "**/*.html",
+                    dest: "dist/framework",
+                }, {
+                    expand: true,
+                    cwd: "i18n",
+                    src: "**/*.html",
+                    dest: "dist/i18n",
+                }, {
+                    expand: true,
+                    cwd: "sysApp",
+                    src: "**/*.html",
+                    dest: "dist/sysApp",
+                }, {
+                    expand: true,
+                    cwd: "themes",
+                    src: "**/*.html",
+                    dest: "dist/themes",
+                }, {
+                    expand: true,
+                    cwd: "",
+                    src: "index.html",
+                    dest: "dist",
+                }]
             },
-            yasuoSrc: {
-                expand: true,
-                cwd: './',
-                src: ['**/*.html'],
-                dest: 'dist'
+            htmlminSrc: {
+                files: [{
+                    expand: true,
+                    cwd: "dist/plugin/src/" + product,
+                    src: "**/*.html",
+                    dest: "dist/plugin/src/" + product,
+                }, {
+                    expand: true,
+                    cwd: "plugin/src/" + product,
+                    src: "**/*.html",
+                    dest: "dist/plugin/src/" + product
+                }
+                ]
             }
         },
         //压缩js
@@ -251,17 +346,17 @@ module.exports = function (grunt) {
                 preserveComments: 'false', //不删除注释，还可以为 false（删除全部注释），some（保留@preserve @license @cc_on等注释）
                 footer: '' //添加footer
             },
-            bulidDist: {
-                expand: true,//表示使用相对路径
-                cwd: "./dist",//相对路径的根目录
-                src: ['**/*.js'],//相对路径下需要压缩的文件，*表示所有该后缀类型的文件，写具体的就是某个具体的文件将会被压缩
-                dest: "dist"//压缩后的文件需要放置的目录，如果不存在的话，会自动创建
+            uglifyFrame: {
+                expand: true,
+                cwd: "./dist",
+                src: ['**/*.js'],
+                dest: "dist"
             },
-            bulidSrc: {
-                expand: true,//表示使用相对路径
-                cwd: "./dist",//相对路径的根目录
-                src: ['**/*.js'],//相对路径下需要压缩的文件，*表示所有该后缀类型的文件，写具体的就是某个具体的文件将会被压缩
-                dest: "dist"//压缩后的文件需要放置的目录，如果不存在的话，会自动创建
+            uglifySrc: {
+                expand: true,
+                cwd: "dist/plugin/src/" + product,
+                src: ['**/*.js'],
+                dest: "dist/plugin/src/" + product,
             }
         },
         //合并文件
@@ -279,21 +374,41 @@ module.exports = function (grunt) {
                 },
             },
             basic_and_extras: {
-                files: concatFileList,
+                files: {},
             },
         },
 
         //赋值配置文件到对应的目录
         copy: {
-            main: {
+            copyFrame: {
                 files: [
                     { expand: true, src: ['imgs/**'], dest: 'dist/' },
-                    { expand: true, src: ['lib/**'], dest: 'dist/' },
+                    { expand: true, src: ['lib/element-ui/lib/**'], dest: 'dist' },
+                    { expand: true, src: ['lib/de-indent/**'], dest: 'dist' },
+                    { expand: true, src: ['lib/he/**'], dest: 'dist' },
+                    { expand: true, src: ['lib/require-css/**'], dest: 'dist' },
+                    { expand: true, src: ['lib/require-json/**'], dest: 'dist' },
+                    { expand: true, src: ['lib/require-text/**'], dest: 'dist' },
+                    { expand: true, src: ['lib/requirejs/**'], dest: 'dist' },
+                    { expand: true, src: ['lib/vue-template-compiler/**'], dest: 'dist' },
+                    { expand: true, src: ['lib/vue/dist/vue.js'], dest: 'dist', filter: 'isFile' },
+                    { expand: true, src: ['lib/require-vuejs/dist/require-vuejs.js'], dest: 'dist', filter: 'isFile' },
+                    { expand: true, src: ['lib/vue-router/dist/vue-router.js'], dest: 'dist', filter: 'isFile' },
+                    { expand: true, src: ['lib/jquery/dist/jquery.js'], dest: 'dist', filter: 'isFile' },
+                    { expand: true, src: ['lib/axios/dist/axios.js'], dest: 'dist', filter: 'isFile' },
+                    { expand: true, src: ['lib/echarts/dist/echarts-all.min.js'], dest: 'dist', filter: 'isFile' },
+                    { expand: true, src: ['lib/d3/dist/d3.js'], dest: 'dist', filter: 'isFile' },
+                    { expand: true, src: ['lib/vuex/dist/vuex.js'], dest: 'dist', filter: 'isFile' },
+                    { expand: true, src: ['lib/vue-i18n/dist/vue-i18n.js'], dest: 'dist', filter: 'isFile' },
+                ],
+            },
+            copySrc: {
+                files: [
                     { expand: true, src: ["plugin/src/" + product + "/configs/**"], dest: "dist/" },
                     { expand: true, src: ["plugin/src/" + product + "/files/**"], dest: "dist/" },
                     { expand: true, src: ["plugin/src/" + product + "/imgs/**"], dest: "dist/" },
                 ],
-            },
+            }
         },
 
     });
@@ -307,15 +422,23 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-babel');
     grunt.loadNpmTasks('grunt-contrib-copy');
 
-    //设置默认任务
-    // grunt.registerTask('default', ['clean:src', 'vue_split_file', 'babel', 'cssmin', 'htmlmin', 'uglify', 'copy', 'concat', 'clean:clena_last']);
 
-    grunt.registerTask("asyncTask", function () {
-        const done = this.async()
-        execGruntTask(done);
+    grunt.registerTask("asyncTaskFrame", function () {
+        const done = this.async();
+        var jsonPath = "dist/vueSplitLog.json";
+        execGruntTaskFrame(done, jsonPath);
     })
-    //grunt.registerTask('default', ['clean:src', "vue_split_file", 'asyncTask'])
-    grunt.registerTask('release', ['clean:src', "vue_split_file", 'asyncTask'])
 
-    //grunt.registerTask('release', ['copy']);
+
+    grunt.registerTask("asyncTaskSrc", function () {
+        const done = this.async();
+        var jsonPath = "dist/vueSplitLog.json";
+        asyncTaskSrc(done, jsonPath);
+    })
+
+
+    grunt.registerTask('frame', ['clean:dist', "vue_split_file:vueSplitFrame", 'asyncTaskFrame'])
+
+    grunt.registerTask('release', ['clean:src', "vue_split_file:vueSplitSrc", 'asyncTaskSrc'])
+
 };
