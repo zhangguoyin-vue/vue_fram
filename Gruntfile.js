@@ -5,9 +5,8 @@ module.exports = function (grunt) {
         grunt.log.writeln('错误：');
         grunt.log.writeln('    parameter of current product can\'t be null!');
         grunt.log.writeln('正确示例：');
-        grunt.log.writeln('    grunt release --product=bhz');
         grunt.log.writeln('    grunt frame --product=frame');
-
+        grunt.log.writeln('    grunt release --product=bhz');
         return;
     } else {
         grunt.log.writeln('parameter of current product is ' + product + '.');
