@@ -22,7 +22,9 @@
     "lib": "lib"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "frame": "grunt frame --product=frame",
+    "build": "grunt release --product=gcss"
   },
   "repository": {
     "type": "git",
